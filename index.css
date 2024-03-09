@@ -1,0 +1,40 @@
+.sec {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 100vh;
+    padding-bottom: 100vh;
+}
+.nav {
+    width: 40%;
+}
+.nav figure {
+    position: sticky;
+    top: 10px;
+}
+.main {
+    width: 50%;
+}
+h2 {
+    margin-bottom: 3rem;
+}
+.plan {
+    filter: grayscale(1);
+    transition: .4s;
+    margin-bottom: 50px;
+
+}
+.plan_1 {
+    background-color: aqua;
+}
+.plan_2 {
+    background-color: red;
+}
+.plan_3 {
+    background-color: blue;
+}
+.plan.active {
+    filter: none;
+}
+img{
+    max-width: 100%;
+}
