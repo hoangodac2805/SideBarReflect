@@ -1,141 +1,130 @@
-class sidebarReflect {
- constructor(params){
-  this.isScrollUp = false;
-  this.sidebarElm = document.querySelector(params.sidebarElm) ? document.querySelector(params.sidebarElm) : null;
-  this.listElms =  document.querySelectorAll(params.listElms) ? document.querySelectorAll(params.listElms) : null;
- } 
-
-  detectScrollDirection (){
-    let lastScrollTop = 0;
-    let _self = this;
-    window.addEventListener('scroll', function() {
-        const currentScrollTop = window.scrollY;
-        if (currentScrollTop > lastScrollTop) {
-            _self.isScrollUp = false;
-        } else if (currentScrollTop < lastScrollTop) {
-          _self.isScrollUp = true;
-        }
-        lastScrollTop = currentScrollTop;
-    });
-  }
-  
-  getCenterMostElement(listsItem) {
-    if(!listsItem) return;
-    const viewportHeight = window.innerHeight;
-
-    let closestElement = null;
-    let minDistance = Infinity;
-    for (const item of listsItem) {
-      const rect = item.elementRect;
-
-      const elementCenterY = rect.top + rect.height / 2;
-
-      const distance = Math.abs(elementCenterY - viewportHeight / 2);
-
-      if (distance < minDistance) {
-        minDistance = distance;
-        closestElement = item;
-      }
-    }
-    return closestElement;
-  }
-
-  firstActive(){
-    let _self = this;
-    let slideInView = [];
-    let windownHeight = window.innerHeight;
-
-    _self.listElms.forEach((element) => {
-      let elementRect = element.getBoundingClientRect();  
-      if(elementRect.bottom > 200 &&  elementRect.bottom - windownHeight  < elementRect.height - 200) {
-        slideInView.push({element,isInView:true,elementRect})
-      }
-    });
-    let willActiveEle = _self.getCenterMostElement(slideInView)?.element;
-
-    if(willActiveEle == null) return;
-
-    let currentActiveEle = document.querySelector('.plan.active');
-    if(willActiveEle == currentActiveEle) return; 
-
-    let imageSrc =  willActiveEle.getAttribute('data-src');
-    _self.sidebarElm.setAttribute('src',imageSrc);
-    currentActiveEle.classList.remove('active');
-    willActiveEle.classList.add('active')
-
-  }
-
-  init(){
-    let _self = this;
-    if(_self.sidebarElm == null || _self.listElms == null ) return;
-    _self.detectScrollDirection();
-    _self.firstActive()
-
-    window.addEventListener('scroll',function(){
-      let slideInView = [];
-      let windownHeight = window.innerHeight;
-
-      _self.listElms.forEach((element) => {
-        let elementRect = element.getBoundingClientRect();
-
-
-        if(elementRect.bottom > 200 &&  elementRect.bottom - windownHeight  < elementRect.height - 200) {
-          slideInView.push({element,isInView:true,elementRect})
-        }
-
-      });
-      if(slideInView.length > 0) {
-        let willActiveEle = null;
-
-        if(slideInView.length == 1) {willActiveEle = slideInView[0].element};
-        if(slideInView.length == 2) {
-          let indexCurrentActiveEle = slideInView.findIndex((slide)=> slide.element.classList.contains('active'));
-
-          willActiveEle = _self.isScrollUp ? 
-          (slideInView[indexCurrentActiveEle - 1] ? slideInView[indexCurrentActiveEle - 1].element : slideInView[indexCurrentActiveEle].element ) : 
-          (slideInView[indexCurrentActiveEle + 1] ? slideInView[indexCurrentActiveEle + 1].element : slideInView[indexCurrentActiveEle].element );
-        }
-        if(slideInView.length >= 3) {
-        
-          let centralSlide = _self.getCenterMostElement(slideInView);
-          let indexCurrentActiveEle = slideInView.findIndex((slide)=> slide.element.classList.contains('active'));
-          let indexCentralSlide= slideInView.findIndex((slide)=> slide == centralSlide);
-          if(_self.isScrollUp){
-            if(indexCurrentActiveEle - indexCentralSlide > 0){
-              willActiveEle = centralSlide.element;
-            }
-          }else{
-            if(indexCurrentActiveEle - indexCentralSlide < 0){
-              willActiveEle = centralSlide.element;
-            }
-          }
-        }
-
-        if(willActiveEle == null) return;
-
-        
-        let currentActiveEle = document.querySelector('.plan.active');
-        if(willActiveEle == currentActiveEle) return; 
-
-        let imageSrc =  willActiveEle.getAttribute('data-src');
-        _self.sidebarElm.setAttribute('src',imageSrc);
-        currentActiveEle.classList.remove('active');
-        willActiveEle.classList.add('active')
-      }
-    })
-
-    
-  }
-
-}
-
-window.addEventListener('load',function(){
-  new sidebarReflect(params={
-    sidebarElm:"#navImg",
-    listElms:".plan"
-  }).init();
-  
-})
+class SidebarReflect {
+  constructor(params){
+   this.isScrollUp = false;
+   this.sidebarElm = document.querySelector(params.sidebarElm) || null;
+   this.listElms =  document.querySelectorAll(params.listElms) || null;
+  } 
+ 
+   detectScrollDirection (){
+     let lastScrollTop = 0;
+     let _self = this;
+     window.addEventListener('scroll', function() {
+         const currentScrollTop = window.scrollY;
+         _self.isScrollUp = currentScrollTop < lastScrollTop;
+         lastScrollTop = currentScrollTop;
+     });
+   }
+   
+   getCenterMostElement(listsItem) {
+     if(!listsItem) return;
+     const viewportHeight = window.innerHeight;
+ 
+     let closestElement = null;
+     let minDistance = Infinity;
+     for (const item of listsItem) {
+       const rect = item.elementRect;
+       const elementCenterY = rect.top + rect.height / 2;
+       const distance = Math.abs(elementCenterY - viewportHeight / 2);
+ 
+       if (distance < minDistance) {
+         minDistance = distance;
+         closestElement = item;
+       }
+     }
+     return closestElement;
+   }
+ 
+   firstActive(){
+     let _self = this;
+     let slideInView = [];
+     let windownHeight = window.innerHeight;
+ 
+     _self.listElms.forEach((element) => {
+       let elementRect = element.getBoundingClientRect();  
+       let minusHeight = Math.min(100,elementRect.height / 2);
+         if(elementRect.bottom > minusHeight &&  elementRect.bottom - windownHeight  < elementRect.height - minusHeight) {
+         slideInView.push({element,isInView:true,elementRect})
+       }
+     });
+     let willActiveEle = _self.getCenterMostElement(slideInView)?.element;
+ 
+     if(willActiveEle == null) return;
+ 
+     let currentActiveEle = document.querySelector('.plan.active');
+     if(willActiveEle == currentActiveEle) return; 
+ 
+     _self.updateSidebar(willActiveEle);
+   }
+ 
+   updateSidebar(willActiveEle) {
+     let _self = this;
+     let imageSrc =  willActiveEle.getAttribute('data-src');
+     _self.sidebarElm.setAttribute('src',imageSrc);
+     document.querySelector('.plan.active').classList.remove('active');
+     willActiveEle.classList.add('active');
+   }
+ 
+   init(){
+     let _self = this;
+     if(_self.sidebarElm == null || _self.listElms == null ) return;
+     _self.detectScrollDirection();
+     _self.firstActive()
+ 
+     window.addEventListener('scroll',function(){
+       let slideInView = [];
+       let windownHeight = window.innerHeight;
+ 
+       _self.listElms.forEach((element) => {
+         let elementRect = element.getBoundingClientRect();
+          let minusHeight = Math.min(100,elementRect.height / 2);
+         if(elementRect.bottom > minusHeight &&  elementRect.bottom - windownHeight  < elementRect.height - minusHeight) {
+           slideInView.push({element,isInView:true,elementRect})
+         }
+ 
+       });
+       if(slideInView.length > 0) {
+         let willActiveEle = null;
+ 
+         if(slideInView.length == 1) {willActiveEle = slideInView[0].element};
+         if(slideInView.length == 2) {
+           let indexCurrentActiveEle = slideInView.findIndex((slide)=> slide.element.classList.contains('active'));
+ 
+           willActiveEle = _self.isScrollUp ? 
+           (slideInView[indexCurrentActiveEle - 1] ? slideInView[indexCurrentActiveEle - 1].element : slideInView[indexCurrentActiveEle].element ) : 
+           (slideInView[indexCurrentActiveEle + 1] ? slideInView[indexCurrentActiveEle + 1].element : slideInView[indexCurrentActiveEle].element );
+         }
+         if(slideInView.length >= 3) {
+           let centralSlide = _self.getCenterMostElement(slideInView);
+           let indexCurrentActiveEle = slideInView.findIndex((slide)=> slide.element.classList.contains('active'));
+           let indexCentralSlide= slideInView.findIndex((slide)=> slide == centralSlide);
+           if(_self.isScrollUp){
+             if(indexCurrentActiveEle - indexCentralSlide > 0){
+               willActiveEle = centralSlide.element;
+             }
+           }else{
+             if(indexCurrentActiveEle - indexCentralSlide < 0){
+               willActiveEle = centralSlide.element;
+             }
+           }
+         }
+ 
+         if(willActiveEle == null) return;
+ 
+         let currentActiveEle = document.querySelector('.plan.active');
+         if(willActiveEle == currentActiveEle) return; 
+ 
+         _self.updateSidebar(willActiveEle);
+       }
+     })
+   }
+ }
+ 
+ window.addEventListener('load',function(){
+   new SidebarReflect({
+     sidebarElm:"#navImg",
+     listElms:".plan"
+   }).init();
+ })
 
 
 
