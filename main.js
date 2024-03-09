@@ -20,6 +20,7 @@ class sidebarReflect {
   }
   
   getCenterMostElement(listsItem) {
+    if(!listsItem) return;
     const viewportHeight = window.innerHeight;
 
     let closestElement = null;
@@ -50,8 +51,8 @@ class sidebarReflect {
         slideInView.push({element,isInView:true,elementRect})
       }
     });
-    let willActiveEle = _self.getCenterMostElement(slideInView).element;
-    console.log(willActiveEle);
+    let willActiveEle = _self.getCenterMostElement(slideInView)?.element;
+
     if(willActiveEle == null) return;
 
     let currentActiveEle = document.querySelector('.plan.active');
@@ -61,12 +62,14 @@ class sidebarReflect {
     _self.sidebarElm.setAttribute('src',imageSrc);
     currentActiveEle.classList.remove('active');
     willActiveEle.classList.add('active')
+
   }
 
   init(){
     let _self = this;
     if(_self.sidebarElm == null || _self.listElms == null ) return;
     _self.detectScrollDirection();
+    _self.firstActive()
 
     window.addEventListener('scroll',function(){
       let slideInView = [];
@@ -93,7 +96,19 @@ class sidebarReflect {
           (slideInView[indexCurrentActiveEle + 1] ? slideInView[indexCurrentActiveEle + 1].element : slideInView[indexCurrentActiveEle].element );
         }
         if(slideInView.length >= 3) {
-          willActiveEle = _self.getCenterMostElement(slideInView).element;
+        
+          let centralSlide = _self.getCenterMostElement(slideInView);
+          let indexCurrentActiveEle = slideInView.findIndex((slide)=> slide.element.classList.contains('active'));
+          let indexCentralSlide= slideInView.findIndex((slide)=> slide == centralSlide);
+          if(_self.isScrollUp){
+            if(indexCurrentActiveEle - indexCentralSlide > 0){
+              willActiveEle = centralSlide.element;
+            }
+          }else{
+            if(indexCurrentActiveEle - indexCentralSlide < 0){
+              willActiveEle = centralSlide.element;
+            }
+          }
         }
 
         if(willActiveEle == null) return;
@@ -109,7 +124,6 @@ class sidebarReflect {
       }
     })
 
-    _self.firstActive()
     
   }
 
