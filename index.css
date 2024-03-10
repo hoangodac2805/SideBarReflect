@@ -32,6 +32,12 @@ h2 {
 .plan_3 {
     background-color: blue;
 }
+.plan_4 {
+    background-color: green;
+}
+.plan_5 {
+    background-color: yellow;
+}
 .plan.active {
     filter: none;
 }
