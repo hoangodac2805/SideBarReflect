@@ -41,7 +41,7 @@ class SidebarReflect {
  
      _self.listElms.forEach((element) => {
        let elementRect = element.getBoundingClientRect();  
-       let minusHeight = Math.min(100,elementRect.height / 2);
+       let minusHeight = Math.min(100,elementRect.height / 3);
          if(elementRect.bottom > minusHeight &&  elementRect.bottom - windownHeight  < elementRect.height - minusHeight) {
          slideInView.push({element,isInView:true,elementRect})
        }
@@ -76,7 +76,7 @@ class SidebarReflect {
  
        _self.listElms.forEach((element) => {
          let elementRect = element.getBoundingClientRect();
-          let minusHeight = Math.min(100,elementRect.height / 2);
+          let minusHeight = Math.min(100,elementRect.height / 3);
          if(elementRect.bottom > minusHeight &&  elementRect.bottom - windownHeight  < elementRect.height - minusHeight) {
            slideInView.push({element,isInView:true,elementRect})
          }
